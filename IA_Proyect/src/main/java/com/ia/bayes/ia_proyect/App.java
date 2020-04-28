@@ -19,17 +19,20 @@ public class App {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException{
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        String connectionURL = "jdbc:sqlserver://DESKTOP-6SPG2D8\\SQLEXPRESS:1433;databaseName=IA_TRAINING_SET;user=IA_USER;password=abcde54321";
+        String connectionURL = "jdbc:sqlserver://urluniversity.database.windows.net:1433;database=IA_TRAIN_SET_DATABASE;user=IA_USER@urluniversity;password=@Bcde54321;"
+                + "             encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
         Connection con = DriverManager.getConnection(connectionURL);
         System.out.println("Nos conectamos");
         
-        /*
+        
         Statement st = con.createStatement();
-        ResultSet result = st.executeQuery("Select * from Producto");
+        ResultSet result = st.executeQuery("SELECT director_name FROM Imdb");
+        
         
         while(result.next()){
-            int Id = result.getInt(1);
+            String data = result.getString(1);
+            System.out.println(data);
         }
-        */
+        
     }
 }

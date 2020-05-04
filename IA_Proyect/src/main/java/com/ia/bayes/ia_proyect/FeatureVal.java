@@ -19,24 +19,15 @@ import java.sql.Statement;
 public class FeatureVal {
     
     private HashMap<String, Double> Feature = new HashMap<>();
+    private String Feature_name = "";
     
     //TODO: Method which calculates argmax of CPT
     
-    /**
-     * A setter for both Value k and probability prob for creating 
-     * their CPT table
-     * @param k
-     * @param prob 
-     */
-    public void SetVal(String k, Double prob){
-        
-        Feature.put(k, prob);
-        
+    public FeatureVal(String Feature_name){
+        this.Feature_name = Feature_name;
     }
     
-    public Double getVal(String k) {
-     return Feature.get(k);
-    }
+    
     
     /**
      * Use to compute their corresponding CPT given a random variable RV.
@@ -51,13 +42,14 @@ public class FeatureVal {
      * @param priori
      * @throws Exception
      */
-    public void SetCPT(String RV, int k, HashMap<String, Double> priori) throws Exception {
+    public void SetCPT(Double k, HashMap<String, Double> priori) throws Exception {
         
         Laplace_Smooth LS = new Laplace_Smooth();
+        setFeature(LS.Calculate_Laplace(getFeature_name(), k, priori));
 
     } 
     
-    private void ComputeSplitCPT(int k, String Feature_name) throws ClassNotFoundException, SQLException{
+    private void ComputeSplitCPT(String Feature_name, Double k) throws ClassNotFoundException, SQLException{
         
         Laplace_Smooth LS = new Laplace_Smooth();
         
@@ -85,6 +77,39 @@ public class FeatureVal {
                 count_0 = result.getDouble(1);
             }
         
-        Feature = LS.Laplace_Smoothing_SplitData(Feature_name, k, count_1, count_0);
+        setFeature(LS.Laplace_Smoothing_SplitData(Feature_name, k, count_1, count_0));
+    }
+    
+    public void SetSplittedCPT(String Feature_name, Double k) throws ClassNotFoundException, SQLException{
+        
+        ComputeSplitCPT(Feature_name, k);
+    }
+
+    /**
+     * @return the Feature
+     */
+    public HashMap<String, Double> getFeature() {
+        return Feature;
+    }
+
+    /**
+     * @param Feature the Feature to set
+     */
+    public void setFeature(HashMap<String, Double> Feature) {
+        this.Feature = Feature;
+    }
+
+    /**
+     * @return the Feature_name
+     */
+    public String getFeature_name() {
+        return Feature_name;
+    }
+
+    /**
+     * @param Feature_name the Feature_name to set
+     */
+    public void setFeature_name(String Feature_name) {
+        this.Feature_name = Feature_name;
     }
 }

@@ -1,4 +1,5 @@
 com\ia\bayes\ia_proyect\PrioriSet.class
+com\ia\bayes\ia_proyect\BayesNetwork.class
 com\ia\bayes\ia_proyect\App.class
 com\ia\bayes\ia_proyect\Laplace_Smooth.class
 com\ia\bayes\ia_proyect\FeatureVal.class

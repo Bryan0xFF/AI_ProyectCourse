@@ -25,6 +25,7 @@ public class App {
         //Creating the bayes network
         
         
+        
         /*
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         String connectionURL = "jdbc:sqlserver://urluniversity.database.windows.net:1433;database=IA_TRAIN_SET_DATABASE;user=IA_USER@urluniversity;password=@Bcde54321;"

@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Laplace_Smooth {
 
-    public HashMap<String, Double> Calculate_Laplace(String Feature_name, int k, HashMap<String, Double> priori) throws SQLException {
+    public HashMap<String, Double> Calculate_Laplace(String Feature_name, Double k, HashMap<String, Double> priori) throws SQLException {
 
         HashMap<String, Double> CPT = new HashMap<>();
         Double reduced_universe = 0d;
@@ -101,7 +101,7 @@ public class Laplace_Smooth {
      * @param k
      * @return
      */
-    public HashMap<String, Double> Calculate_Laplace(int k) {
+    public HashMap<String, Double> Calculate_Laplace(Double k) {
 
         HashMap<String, Double> prioriTable = new HashMap<>();
         Double count1 = 0d;
@@ -159,7 +159,7 @@ public class Laplace_Smooth {
      * @param countOf_0
      * @return
      */
-    public HashMap<String, Double> Laplace_Smoothing_SplitData(String Feature_value, int k, Double countOf_1, Double countOf_0) throws SQLException {
+    public HashMap<String, Double> Laplace_Smoothing_SplitData(String Feature_value, Double k, Double countOf_1, Double countOf_0) throws SQLException {
 
         //retrieve data from server
         List<String> retrieved_data = new ArrayList<>();

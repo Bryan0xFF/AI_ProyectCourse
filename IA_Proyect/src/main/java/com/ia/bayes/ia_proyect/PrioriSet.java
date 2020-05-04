@@ -18,27 +18,11 @@ public class PrioriSet {
     
     //TODO: Method which calculates argmax of CPT
     
-    /**
-     * A setter for both Value k and probability prob for creating 
-     * their CPT table
-     * @param k
-     * @param prob 
-     */
-    public void SetVal(String k, Double prob){
-        
-        Feature.put(k, prob);
-        
-    }
-    
-    public Double getVal(String k) {
-     return Feature.get(k);
-    }
-    
     private void ComputePT(String prioriValue) throws SQLException{
         
        Laplace_Smooth LS = new Laplace_Smooth();
        
-       Feature = LS.Calculate_Laplace(prioriValue, 3, Feature);
+       Feature = LS.Calculate_Laplace(prioriValue, 3d, Feature);
        
     }
 }

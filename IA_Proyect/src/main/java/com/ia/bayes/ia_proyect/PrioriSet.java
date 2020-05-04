@@ -5,6 +5,7 @@
  */
 package com.ia.bayes.ia_proyect;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
@@ -33,11 +34,11 @@ public class PrioriSet {
      return Feature.get(k);
     }
     
-    private void ComputePT(String prioriValue){
+    private void ComputePT(String prioriValue) throws SQLException{
         
        Laplace_Smooth LS = new Laplace_Smooth();
        
-       Feature LS.Calculate_Laplace(prioriValue, 3, Feature);
+       Feature = LS.Calculate_Laplace(prioriValue, 3, Feature);
        
     }
 }

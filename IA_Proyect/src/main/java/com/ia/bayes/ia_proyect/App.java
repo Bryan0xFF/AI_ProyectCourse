@@ -21,6 +21,11 @@ import java.sql.Statement;
 public class App {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException{
+        
+        //Creating the bayes network
+        
+        
+        /*
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         String connectionURL = "jdbc:sqlserver://urluniversity.database.windows.net:1433;database=IA_TRAIN_SET_DATABASE;user=IA_USER@urluniversity;password=@Bcde54321;"
                 + "             encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
@@ -38,7 +43,7 @@ public class App {
         }
         
         //INSERTION INTO DATABASE SINCE AZURE DOESNT ALLOW STUDENT SUBSCRIPTIONS TO USE BLOB STORAGE
-        /*
+        
         String[] lines = null;
 
         try {

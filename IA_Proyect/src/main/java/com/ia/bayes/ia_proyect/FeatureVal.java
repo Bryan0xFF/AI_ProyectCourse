@@ -53,35 +53,38 @@ public class FeatureVal {
      */
     public void SetCPT(String RV, int k, HashMap<String, Double> priori) throws Exception {
         
-        
+        Laplace_Smooth LS = new Laplace_Smooth();
 
-        
-        
-        
-
-    }
+    } 
     
-    private HashMap<String, Double> Laplace_Smoothing(String Feature_name, int k, HashMap<String, Double> priori) throws SQLException{
+    private void ComputeSplitCPT(int k, String Feature_name) throws ClassNotFoundException, SQLException{
         
-        String connectionURL = "jdbc:sqlserver://urluniversity.database"
-                + ".windows.net:1433;database=IA_TRAIN_SET_DATABASE;"
-                + "user=IA_USER@urluniversity;password=@Bcde54321;"
+        Laplace_Smooth LS = new Laplace_Smooth();
+        
+        Double count_1 = 0d;
+        Double count_0 = 0d;
+        
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            String connectionURL = "jdbc:sqlserver://urluniversity.database"
+                    + ".windows.net:1433;database=IA_TRAIN_SET_DATABASE;user="
+                    + "IA_USER@urluniversity;password=@Bcde54321;"
                     + "encrypt=true;trustServerCertificate=false;"
-                + "hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
+                    + "hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
             Connection con = DriverManager.getConnection(connectionURL);
-           
-            
-            
-            //this gets the Fi count
+
             Statement st = con.createStatement();
-            ResultSet result = st.executeQuery("select "
-                    + "count( distinct " + Feature_name + ") from Imdb");
+            ResultSet result = st.executeQuery("SELECT count(*) FROM Imdb WHERE imdb_score >= 5");
             
-            //we compute n*k given n = total of RVi * k Priori column
+            while(result.next()){
+                count_1 = result.getDouble(1);
+            }
             
+            result = st.executeQuery("SELECT count(*) FROM Imdb WHERE imdb_score < 5");
+            
+            while(result.next()){
+                count_0 = result.getDouble(1);
+            }
         
-        return null;
+        Feature = LS.Laplace_Smoothing_SplitData(Feature_name, k, count_1, count_0);
     }
-    
-    
 }

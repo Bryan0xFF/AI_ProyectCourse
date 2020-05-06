@@ -53,31 +53,7 @@ public class FeatureVal {
         
         Laplace_Smooth LS = new Laplace_Smooth();
         
-        Double count_1 = 0d;
-        Double count_0 = 0d;
-        
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String connectionURL = "jdbc:sqlserver://urluniversity.database"
-                    + ".windows.net:1433;database=IA_TRAIN_SET_DATABASE;user="
-                    + "IA_USER@urluniversity;password=@Bcde54321;"
-                    + "encrypt=true;trustServerCertificate=false;"
-                    + "hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
-            Connection con = DriverManager.getConnection(connectionURL);
-
-            Statement st = con.createStatement();
-            ResultSet result = st.executeQuery("SELECT count(*) FROM Imdb WHERE imdb_score >= 5");
-            
-            while(result.next()){
-                count_1 = result.getDouble(1);
-            }
-            
-            result = st.executeQuery("SELECT count(*) FROM Imdb WHERE imdb_score < 5");
-            
-            while(result.next()){
-                count_0 = result.getDouble(1);
-            }
-        
-        setFeature(LS.Laplace_Smoothing_SplitData(Feature_name, k, count_1, count_0, priori_name));
+        setFeature(LS.Laplace_Smoothing_SplitData(Feature_name, k, priori_name));
     }
     
     public void SetSplittedCPT(String Feature_name, Double k, String priori_name) throws ClassNotFoundException, SQLException{

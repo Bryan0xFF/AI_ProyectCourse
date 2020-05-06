@@ -35,4 +35,16 @@ public class BayesNetwork {
         return true;
     }
     
+     public Boolean setFeatureSplit(FeatureVal feature) throws Exception{
+        
+        if(feature != null){
+            feature.SetSplittedCPT(feature.getFeature_name(), 3.0, priori.getPriori_name());
+            Features.add(feature);
+        }else{
+            return false;
+        }
+        
+        return true;
+    }
+    
 }

@@ -69,7 +69,7 @@ public class Laplace_Smooth {
         //O(2*n)
         String query = "SELECT DISTINCT " + Feature_name + ", count(" + Feature_name + ") from Imdb "
                 + "WHERE " + priori_name + " >= 5 GROUP BY " + Feature_name;
-        
+
         result = st.executeQuery(query);
 
         while (result.next()) {
@@ -79,9 +79,8 @@ public class Laplace_Smooth {
             Double PLAP = Math.log((result.getDouble(2) + k) / (reduced_universe + k * feature_summation));
 
             CPT.put((Fi + "|1").trim(), PLAP);
-            CPT.put((Fi + "|0").trim(), Math.log(k/(reduced_universe + k*feature_summation)));
+            CPT.put((Fi + "|0").trim(), Math.log(k / (reduced_universe + k * feature_summation)));
         }
-        
 
         result = st.executeQuery("SELECT DISTINCT " + Feature_name + ", count(" + Feature_name + ") from Imdb "
                 + "WHERE " + priori_name + " < 5 GROUP BY " + Feature_name);
@@ -89,10 +88,10 @@ public class Laplace_Smooth {
         while (result.next()) {
 
             String negate_Fi = result.getString(1);
-            
+
             Double prob = Math.log((result.getDouble(2) + k) / (reduced_universe + k * feature_summation));
-            
-            if(CPT.containsKey((negate_Fi + "|0").trim())){
+
+            if (CPT.containsKey((negate_Fi + "|0").trim())) {
                 CPT.compute((negate_Fi + "|0").trim(), (key, val) -> val = prob);
             }
 
@@ -165,13 +164,13 @@ public class Laplace_Smooth {
      *
      * @param Feature_value
      * @param k
-     * @param countOf_1
-     * @param countOf_0
+     *
      * @return
      */
-    public HashMap<String, Double> Laplace_Smoothing_SplitData(String Feature_value, Double k, Double countOf_1, Double countOf_0, String priori_name) throws SQLException {
+    public HashMap<String, Double> Laplace_Smoothing_SplitData(String Feature_value, Double k, String priori_name) throws SQLException {
 
         //retrieve data from server
+        Double universe = 0d;
         List<String> retrieved_data = new ArrayList<>();
         List<String> total_features = new CopyOnWriteArrayList<>();
         ConcurrentHashMap<String, Double> individual_data_count_1 = new ConcurrentHashMap<>();
@@ -185,7 +184,14 @@ public class Laplace_Smooth {
         Connection con = DriverManager.getConnection(connectionURL);
 
         Statement st = con.createStatement();
-        ResultSet result = st.executeQuery("SELECT " + Feature_value + " from Imdb WHERE " + priori_name + " >= 5");
+        ResultSet result = st.executeQuery("SELECT COUNT(" + Feature_value + ") FROM Imdb");
+
+        while (result.next()) {
+            universe = result.getDouble(1);
+        }
+
+        st = con.createStatement();
+        result = st.executeQuery("SELECT " + Feature_value + " from Imdb WHERE " + priori_name + " >= 5");
 
         while (result.next()) {
             retrieved_data.add(result.getString(1));
@@ -194,11 +200,15 @@ public class Laplace_Smooth {
         //count needs to be done local due to spliteration of data needs that needs to be analyzed
         retrieved_data.parallelStream().forEach(x -> {
 
-            String[] split = x.split("|");
+            String[] split = x.split("\\|");
 
             for (String split1 : split) {
-                individual_data_count_1.computeIfPresent(split1.trim() + "|1", (key, val) -> val = val + 1);
-                individual_data_count_1.computeIfAbsent(split1.trim(), (key) -> 1d);
+                individual_data_count_1.computeIfPresent((split1.trim() + "|1").trim(), (key, val) -> val += 1);
+                individual_data_count_1.computeIfAbsent((split1.trim() + "|1").trim(), (key) -> 1.0);
+                
+                if(!individual_data_count_0.contains((split1 + "|0").trim())){
+                    individual_data_count_0.put((split1 + "|0"), 0.0);
+                }
 
                 if (total_features.contains(split1)) {
 
@@ -209,7 +219,8 @@ public class Laplace_Smooth {
 
         });
 
-        result = st.executeQuery("SELECT distinct " + Feature_value + " from Imdb WHERE imdb_score < 5");
+        result = st.executeQuery("SELECT " + Feature_value + " FROM Imdb WHERE " + priori_name + " < 5");
+        retrieved_data.clear();
 
         while (result.next()) {
             retrieved_data.add(result.getString(1));
@@ -218,11 +229,11 @@ public class Laplace_Smooth {
         //count needs to be done local due to spliteration of data needs that needs to be analyzed
         retrieved_data.parallelStream().forEach(x -> {
 
-            String[] split = x.split("|");
+            String[] split = x.split("\\|");
 
             for (String split1 : split) {
-                individual_data_count_0.computeIfPresent(split1.trim() + "|0", (key, val) -> val = val + 1);
-                individual_data_count_0.computeIfAbsent(split1.trim(), (key) -> 1d);
+                individual_data_count_0.computeIfPresent((split1 + "|0").trim(), (key, val) -> val += 1);
+                individual_data_count_0.computeIfAbsent((split1 + "|0").trim(), (key) -> 1.0);
 
                 if (total_features.contains(split1)) {
 
@@ -232,11 +243,13 @@ public class Laplace_Smooth {
             }
 
         });
+
+        final Double lambda_universe = universe;
 
         //we compute the laplacian of the obtained individual counts of each HashMap<>, given 1:
-        individual_data_count_1.replaceAll((key, val) -> Math.log((val + k) / (countOf_1 + k * total_features.size())));
+        individual_data_count_1.replaceAll((key, val) -> Math.log((val + k) / (lambda_universe + k * total_features.size())));
 
-        individual_data_count_0.replaceAll((key, val) -> Math.log((val + k) / (countOf_0 + k * total_features.size())));
+        individual_data_count_0.replaceAll((key, val) -> Math.log((val + k) / (lambda_universe + k * total_features.size())));
 
         HashMap<String, Double> return_val = new HashMap<>();
 

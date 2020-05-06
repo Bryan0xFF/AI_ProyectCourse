@@ -31,6 +31,28 @@ public class App {
         //add the Features to the Bayes Network
         FeatureVal director = new FeatureVal("director_name");
         BN.setFeature(director);
-       
+        
+        FeatureVal genre = new FeatureVal("genre");
+        BN.setFeatureSplit(genre);
+        
+        FeatureVal plot_keywords = new FeatureVal("plot_keywords");
+        BN.setFeatureSplit(plot_keywords);
+        
+        FeatureVal actor_1 = new FeatureVal("actor_1_name");
+        BN.setFeature(actor_1);
+        
+        FeatureVal actor_2 = new FeatureVal("actor_2_name");
+        BN.setFeature(actor_2);
+        
+        FeatureVal actor_3 = new FeatureVal("actor_3_name");
+        BN.setFeature(actor_3);
+        
+        FeatureVal country = new FeatureVal("country");
+        BN.setFeature(country);
+        
+        FeatureVal content_rating = new FeatureVal("content_rating");
+        BN.setFeature(content_rating);
+        
+        
     }
 }

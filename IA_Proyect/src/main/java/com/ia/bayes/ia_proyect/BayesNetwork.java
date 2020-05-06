@@ -23,9 +23,10 @@ public class BayesNetwork {
         
     }
     
-    public Boolean setFeature(FeatureVal feature){
+    public Boolean setFeature(FeatureVal feature) throws Exception{
         
         if(feature != null){
+            feature.SetCPT(3.0, priori.getPriori_name());
             Features.add(feature);
         }else{
             return false;

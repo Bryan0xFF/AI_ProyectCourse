@@ -15,14 +15,31 @@ import java.util.HashMap;
 public class PrioriSet {
     
     private HashMap<String, Double> Feature = new HashMap<>();
+    private String priori_name = "";
     
     //TODO: Method which calculates argmax of CPT
     
-    private void ComputePT(String prioriValue) throws SQLException{
+    public void ComputePT(String prioriValue) throws SQLException{
+        
+        setPriori_name(prioriValue);
         
        Laplace_Smooth LS = new Laplace_Smooth();
        
-       Feature = LS.Calculate_Laplace(prioriValue, 3d, Feature);
+       Feature = LS.Calculate_Laplace_Priori(prioriValue, 3d);
        
+    }
+
+    /**
+     * @return the priori_name
+     */
+    public String getPriori_name() {
+        return priori_name;
+    }
+
+    /**
+     * @param priori_name the priori_name to set
+     */
+    public void setPriori_name(String priori_name) {
+        this.priori_name = priori_name;
     }
 }

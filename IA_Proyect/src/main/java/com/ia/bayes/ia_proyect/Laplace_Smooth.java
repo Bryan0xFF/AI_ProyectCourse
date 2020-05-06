@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Laplace_Smooth {
 
-    public HashMap<String, Double> Calculate_Laplace(String Feature_name, Double k, HashMap<String, Double> priori) throws SQLException {
+    public HashMap<String, Double> Calculate_Laplace(String Feature_name, Double k, String priori_name) throws SQLException {
 
         HashMap<String, Double> CPT = new HashMap<>();
         Double reduced_universe = 0d;
@@ -50,7 +50,7 @@ public class Laplace_Smooth {
         }
 
         //get all the observed events Fi of a reduce universe
-        result = st.executeQuery("SELECT count(" + Feature_name + ") from Imdb  WHERE imdb_score > 5");
+        result = st.executeQuery("SELECT COUNT(" + Feature_name + ") FROM Imdb");
 
         while (result.next()) {
             reduced_universe = result.getDouble(1);
@@ -67,25 +67,34 @@ public class Laplace_Smooth {
         //1. prob of (Fi|X=x)
         //2. Prob of (Fi|X=~x)
         //O(2*n)
-        result = st.executeQuery("SELECT DISTINCT" + Feature_name + ", count(" + Feature_name + ") from Imdb "
-                + "WHERE imdb_score > 5 GROUP BY " + Feature_name);
+        String query = "SELECT DISTINCT " + Feature_name + ", count(" + Feature_name + ") from Imdb "
+                + "WHERE " + priori_name + " >= 5 GROUP BY " + Feature_name;
+        
+        result = st.executeQuery(query);
 
         while (result.next()) {
             String Fi = result.getString(1);
 
             //we apply here the P-LAP(Fi|Y)
-            Double PLAP = (result.getDouble(2) + k) / (reduced_universe + k * feature_summation);
+            Double PLAP = Math.log((result.getDouble(2) + k) / (reduced_universe + k * feature_summation));
 
-            CPT.put(Fi + "|1", PLAP);
+            CPT.put((Fi + "|1").trim(), PLAP);
+            CPT.put((Fi + "|0").trim(), Math.log(k/(reduced_universe + k*feature_summation)));
         }
+        
 
-        result = st.executeQuery("SELECT DISTINCT" + Feature_name + ", count(" + Feature_name + ") from Imdb "
-                + "WHERE imdb_score < 5 GROUP BY " + Feature_name);
+        result = st.executeQuery("SELECT DISTINCT " + Feature_name + ", count(" + Feature_name + ") from Imdb "
+                + "WHERE " + priori_name + " < 5 GROUP BY " + Feature_name);
 
         while (result.next()) {
 
             String negate_Fi = result.getString(1);
-            Double prob = Math.log(result.getDouble(2));
+            
+            Double prob = Math.log((result.getDouble(2) + k) / (reduced_universe + k * feature_summation));
+            
+            if(CPT.containsKey((negate_Fi + "|0").trim())){
+                CPT.compute((negate_Fi + "|0").trim(), (key, val) -> val = prob);
+            }
 
             CPT.put(negate_Fi + "|0", prob);
         }
@@ -101,7 +110,7 @@ public class Laplace_Smooth {
      * @param k
      * @return
      */
-    public HashMap<String, Double> Calculate_Laplace(Double k) {
+    public HashMap<String, Double> Calculate_Laplace_Priori(String priori_feature, Double k) {
 
         HashMap<String, Double> prioriTable = new HashMap<>();
         Double count1 = 0d;
@@ -117,7 +126,8 @@ public class Laplace_Smooth {
             Connection con = DriverManager.getConnection(connectionURL);
 
             Statement st = con.createStatement();
-            ResultSet result = st.executeQuery("SELECT imdb_score FROM Imdb WHERE imdb_score > 5");
+            String query = "SELECT count(" + priori_feature + ") FROM Imdb WHERE " + priori_feature + " >= 5";
+            ResultSet result = st.executeQuery(query);
 
             while (result.next()) {
                 count1 = result.getDouble(1);
@@ -159,7 +169,7 @@ public class Laplace_Smooth {
      * @param countOf_0
      * @return
      */
-    public HashMap<String, Double> Laplace_Smoothing_SplitData(String Feature_value, Double k, Double countOf_1, Double countOf_0) throws SQLException {
+    public HashMap<String, Double> Laplace_Smoothing_SplitData(String Feature_value, Double k, Double countOf_1, Double countOf_0, String priori_name) throws SQLException {
 
         //retrieve data from server
         List<String> retrieved_data = new ArrayList<>();
@@ -175,7 +185,7 @@ public class Laplace_Smooth {
         Connection con = DriverManager.getConnection(connectionURL);
 
         Statement st = con.createStatement();
-        ResultSet result = st.executeQuery("SELECT distinct " + Feature_value + " from Imdb WHERE imdb_score >= 5");
+        ResultSet result = st.executeQuery("SELECT " + Feature_value + " from Imdb WHERE " + priori_name + " >= 5");
 
         while (result.next()) {
             retrieved_data.add(result.getString(1));

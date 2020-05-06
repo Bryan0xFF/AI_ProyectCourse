@@ -39,17 +39,17 @@ public class FeatureVal {
      *
      * @param RV
      * @param k
-     * @param priori
+     * @param priori_name
      * @throws Exception
      */
-    public void SetCPT(Double k, HashMap<String, Double> priori) throws Exception {
+    public void SetCPT(Double k, String priori_name) throws Exception {
         
         Laplace_Smooth LS = new Laplace_Smooth();
-        setFeature(LS.Calculate_Laplace(getFeature_name(), k, priori));
+        setFeature(LS.Calculate_Laplace(getFeature_name(), k, priori_name));
 
     } 
     
-    private void ComputeSplitCPT(String Feature_name, Double k) throws ClassNotFoundException, SQLException{
+    private void ComputeSplitCPT(String Feature_name, Double k, String priori_name) throws ClassNotFoundException, SQLException{
         
         Laplace_Smooth LS = new Laplace_Smooth();
         
@@ -77,12 +77,12 @@ public class FeatureVal {
                 count_0 = result.getDouble(1);
             }
         
-        setFeature(LS.Laplace_Smoothing_SplitData(Feature_name, k, count_1, count_0));
+        setFeature(LS.Laplace_Smoothing_SplitData(Feature_name, k, count_1, count_0, priori_name));
     }
     
-    public void SetSplittedCPT(String Feature_name, Double k) throws ClassNotFoundException, SQLException{
+    public void SetSplittedCPT(String Feature_name, Double k, String priori_name) throws ClassNotFoundException, SQLException{
         
-        ComputeSplitCPT(Feature_name, k);
+        ComputeSplitCPT(Feature_name, k, priori_name);
     }
 
     /**

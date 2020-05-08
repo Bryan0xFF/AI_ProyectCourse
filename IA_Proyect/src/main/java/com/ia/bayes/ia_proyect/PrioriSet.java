@@ -25,7 +25,7 @@ public class PrioriSet {
         
        Laplace_Smooth LS = new Laplace_Smooth();
        
-       Feature = LS.Calculate_Laplace_Priori(prioriValue, 3d);
+        setFeature(LS.Calculate_Laplace_Priori(prioriValue, 3d));
        
     }
 
@@ -41,5 +41,19 @@ public class PrioriSet {
      */
     public void setPriori_name(String priori_name) {
         this.priori_name = priori_name;
+    }
+
+    /**
+     * @return the Feature
+     */
+    public HashMap<String, Double> getFeature() {
+        return Feature;
+    }
+
+    /**
+     * @param Feature the Feature to set
+     */
+    public void setFeature(HashMap<String, Double> Feature) {
+        this.Feature = Feature;
     }
 }
